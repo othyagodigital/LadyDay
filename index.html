@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel de Tráfego Pago useladyday</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: barra superior branca com título e período; fundo cinza-azulado; cartões brancos arredondados em grade. Tema único claro. */
+:root{
+  color-scheme:light;
+  --page:#f3f6f9;
+  --surface:#ffffff;
+  --ink:#14171f;
+  --ink-2:#4a5160;
+  --muted:#8a91a0;
+  --grid:#e6eaef;
+  --axis:#cfd6de;
+  --accent:#1a73b8;
+  --accent-soft:#e6f1fa;
+  --good:#1a8a3a;
+  --s1:#2a78d6;
+  --s2:#eb6834;
+  --s3:#1baf7a;
+  --s4:#eda100;
+  --m-spend:#898781;
+  --m-rev:#184f95;
+  --font-display:"Lexend","Segoe UI",Arial,sans-serif;
+  --font-body:"Lexend","Segoe UI",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--page);color:var(--ink);font-family:var(--font-body);font-size:14px;line-height:1.5;font-weight:300}
+h1,h2,h3{font-family:var(--font-display);margin:0;line-height:1.2;text-wrap:balance}
+h1{font-size:1.45rem;font-weight:600}
+h2{font-size:1.02rem;font-weight:600}
+p{margin:0}
+.num{font-variant-numeric:tabular-nums}
+header.bar{background:var(--surface);border-bottom:1px solid var(--grid)}
+.bar-in{max-width:1240px;margin:0 auto;padding:22px 24px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px}
+.brand{display:flex;flex-direction:column;gap:6px}
+.kicker{font-size:.8rem;color:var(--ink-2);display:inline-flex;align-items:center;gap:6px}
+.kicker::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--accent);display:inline-block}
+.period-wrap{display:flex;align-items:center;gap:10px;font-size:.85rem;font-weight:400;color:var(--ink)}
+.period{border:1px solid var(--axis);border-radius:6px;padding:8px 14px;background:var(--surface);font-weight:300}
+main{max-width:1240px;margin:0 auto;padding:24px 24px 48px;display:flex;flex-direction:column;gap:16px}
+.panel{background:var(--surface);border:1px solid var(--grid);border-radius:12px;padding:22px 26px;box-shadow:0 1px 2px rgba(20,23,31,.04)}
+.top{display:grid;grid-template-columns:minmax(0,2fr) minmax(260px,1fr);gap:16px}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.tile{display:flex;flex-direction:column;gap:2px;padding:14px 18px}
+.tile .label{font-size:.82rem;color:var(--ink-2)}
+.tile .value{font-family:var(--font-display);font-size:1.45rem;font-weight:600;line-height:1.2}
+.tile .sub{font-size:.76rem;color:var(--good);font-weight:400}
+.gauge{display:flex;flex-direction:column;gap:8px}
+.gauge svg{width:100%;max-width:240px;align-self:center}
+.gauge p{font-size:.8rem;color:var(--ink-2)}
+.charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.chart-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+.chart-box{position:relative;height:290px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font:inherit;font-size:.76rem;padding:5px 11px;border-radius:6px;border:1px solid var(--axis);background:var(--surface);color:var(--ink-2);cursor:pointer}
+.seg button:hover{border-color:var(--accent);color:var(--accent)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#ffffff;border-color:var(--accent)}
+.seg button:focus-visible,th button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.78rem;color:var(--ink-2);margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.table-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:900px;font-size:.82rem}
+th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--grid);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th button{font:inherit;font-size:.76rem;font-weight:500;color:var(--ink-2);background:none;border:0;padding:0;cursor:pointer}
+th button:hover{color:var(--accent)}
+td i{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:8px}
+tbody tr:hover{background:var(--page)}
+tbody tr:last-child td{border-bottom:0}
+.hint{font-size:.76rem;color:var(--muted)}
+.highlights{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.hl{display:flex;flex-direction:column;gap:6px;padding:16px 18px}
+.hl strong{font-family:var(--font-display);font-size:1.15rem;font-weight:600}
+.hl p{font-size:.82rem;color:var(--ink-2)}
+footer{margin-top:8px;padding-top:18px;border-top:1px solid var(--grid);display:flex;flex-direction:column;gap:6px;font-size:.76rem;color:var(--muted)}
+footer .credit{font-size:.9rem;color:var(--ink);font-weight:500}
+@media (max-width:900px){.top,.charts{grid-template-columns:1fr}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:420px){.tile .value{font-size:1.2rem}.bar-in,main{padding-left:16px;padding-right:16px}}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="bar-in">
+    <div class="brand">
+      <h1>Painel Meta Ads useladyday</h1>
+      <span class="kicker">Meta Ads · Facebook e Instagram</span>
+    </div>
+    <div class="period-wrap"><span>Período do relatório:</span><span class="period">Últimos 25 dias · emitido em 13/11/2026</span></div>
+  </div>
+</header>
+<main>
+
+<section class="top">
+  <div class="tiles">
+    <div class="panel tile"><span class="label">Receita atribuída</span><span class="value num">R$ 16.879,14</span><span class="sub">Compras no site</span></div>
+    <div class="panel tile"><span class="label">ROAS das campanhas de venda</span><span class="value num">8,50</span><span class="sub">Retorno por real investido</span></div>
+    <div class="panel tile"><span class="label">Compras no site</span><span class="value num">27</span><span class="sub num">R$ 73,57 por compra</span></div>
+    <div class="panel tile"><span class="label">Ticket médio</span><span class="value num">R$ 625,15</span><span class="sub">Por pedido</span></div>
+    <div class="panel tile"><span class="label">Investimento total</span><span class="value num">R$ 2.283,32</span><span class="sub">4 campanhas</span></div>
+    <div class="panel tile"><span class="label">Impressões</span><span class="value num">147.537</span><span class="sub num">CPM médio de R$ 15,48</span></div>
+    <div class="panel tile"><span class="label">Alcance</span><span class="value num">55.670</span><span class="sub">Soma das campanhas</span></div>
+    <div class="panel tile"><span class="label">Visualizações da página</span><span class="value num">2.132</span><span class="sub num">Grupo de atacado · R$ 0,14 cada</span></div>
+  </div>
+  <div class="panel gauge">
+    <h2>Frequência, considere otimizar acima de 4</h2>
+    <svg viewBox="0 0 200 124" role="img" aria-label="Frequência média de 2,65 em uma escala de 0 a 8, abaixo da referência de 4">
+      <path d="M20 100 A80 80 0 0 1 180 100" fill="none" stroke="var(--grid)" stroke-width="18"/>
+      <path d="M20 100 A80 80 0 0 1 180 100" fill="none" stroke="var(--s1)" stroke-width="18" stroke-dasharray="83.25 251.33"/>
+      <line x1="100" y1="8" x2="100" y2="32" stroke="var(--s4)" stroke-width="3"/>
+      <text x="100" y="98" text-anchor="middle" font-family="Lexend, sans-serif" font-size="24" font-weight="600" fill="var(--ink)">2,65</text>
+      <text x="20" y="120" text-anchor="middle" font-size="10" fill="var(--muted)">0</text>
+      <text x="180" y="120" text-anchor="middle" font-size="10" fill="var(--muted)">8</text>
+      <text x="100" y="120" text-anchor="middle" font-size="10" fill="var(--muted)">referência: 4</text>
+    </svg>
+    <p>Cada pessoa viu os anúncios 2,65 vezes em média, dentro da faixa recomendada de até 4 exibições.</p>
+  </div>
+</section>
+
+<section class="charts">
+  <div class="panel">
+    <div class="chart-head"><h2>Investimento e receita por campanha</h2></div>
+    <div class="chart-box"><canvas id="chartMoney" aria-label="Gráfico de barras com investimento e receita por campanha"></canvas></div>
+  </div>
+
+  <div class="panel">
+    <div class="chart-head">
+      <h2 id="metricTitle">ROAS por campanha</h2>
+      <div class="seg" id="metricSeg" role="group" aria-label="Indicador exibido"></div>
+    </div>
+    <div class="chart-box"><canvas id="chartMetric" aria-label="Gráfico de barras do indicador selecionado por campanha"></canvas></div>
+  </div>
+
+  <div class="panel">
+    <div class="chart-head">
+      <h2 id="shareTitle">Distribuição da receita</h2>
+      <div class="seg" id="shareSeg" role="group" aria-label="Distribuição exibida"></div>
+    </div>
+    <div class="chart-box"><canvas id="chartShare" aria-label="Gráfico de rosca com a participação de cada campanha"></canvas></div>
+    <div class="legend" id="shareLegend"></div>
+  </div>
+
+  <div class="panel">
+    <div class="chart-head"><h2>Custo e retorno a cada mil impressões</h2></div>
+    <div class="chart-box"><canvas id="chartMille" aria-label="Gráfico de barras com custo e receita por mil impressões nas campanhas de venda"></canvas></div>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="chart-head"><h2>Indicadores por campanha</h2><span class="hint">Clique no título de uma coluna para ordenar</span></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr id="tableHead"></tr></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+</section>
+
+<section class="highlights">
+  <div class="panel hl"><strong class="num">R$ 8,50 por R$ 1,00</strong><p>Retorno das campanhas de venda no período, com R$ 14.892,78 de receita acima do valor investido nelas.</p></div>
+  <div class="panel hl"><strong class="num">ROAS de 9,24</strong><p>A campanha VENDAS - no SITE gerou 15 compras e R$ 9.777,64, com o maior ticket médio entre as campanhas principais.</p></div>
+  <div class="panel hl"><strong class="num">29.313 pessoas</strong><p>Alcance da campanha do grupo de atacado, com o menor CPM da conta (R$ 7,97) e 2.132 visualizações da página.</p></div>
+  <div class="panel hl"><strong class="num">11,8% da receita</strong><p>Proporção do investimento em campanhas de venda sobre a receita atribuída a elas.</p></div>
+</section>
+
+<footer>
+  <span class="credit">Relatório desenvolvido por Othyagodigital</span>
+  <span>Fonte: Gerenciador de Anúncios da Meta. ROAS = receita ÷ investimento · CPM = custo por mil impressões · frequência = impressões ÷ alcance.</span>
+</footer>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+(function(){
+  var campaigns = [
+    {id:'site',   name:'VENDAS - no SITE',                    short:'no SITE',    color:'--s1', spend:1057.88, purchases:15,   revenue:9777.64, roas:9.24,  cpa:70.53, reach:11604, freq:3.90, impressions:45252, cpm:23.38},
+    {id:'quente', name:'VENDAS - SITE [QUENTE 30] [COMPRAS]', short:'QUENTE 30',  color:'--s2', spend:904.16,  purchases:11,   revenue:6627.50, roas:7.33,  cpa:82.20, reach:13817, freq:4.60, impressions:63490, cpm:14.24},
+    {id:'atacado',name:'GRUPO ATACADO - WHATSAPP',            short:'ATACADO',    color:'--s3', spend:296.96,  purchases:null, revenue:null,    roas:null,  cpa:null,  reach:29313, freq:1.27, impressions:37258, cpm:7.97},
+    {id:'sj',     name:'VENDAS - OUTUBRO/NOVEMBRO [1] — SJ',  short:'OUT/NOV SJ', color:'--s4', spend:24.32,   purchases:1,    revenue:474.00,  roas:19.49, cpa:24.32, reach:936,   freq:1.64, impressions:1537,  cpm:15.82}
+  ];
+
+  function brl(v){return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
+  function dec(v){return v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function int(v){return v.toLocaleString('pt-BR');}
+  function pct(v){return v.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%';}
+
+  var metrics = [
+    {key:'roas',        label:'ROAS',             fmt:dec},
+    {key:'purchases',   label:'Compras',          fmt:int},
+    {key:'cpa',         label:'Custo por compra', fmt:brl},
+    {key:'reach',       label:'Alcance',          fmt:int},
+    {key:'impressions', label:'Impressões',       fmt:int},
+    {key:'cpm',         label:'CPM',              fmt:brl},
+    {key:'freq',        label:'Frequência',       fmt:dec}
+  ];
+  var shares = [
+    {key:'revenue',     label:'Receita',      title:'Distribuição da receita',      fmt:brl},
+    {key:'spend',       label:'Investimento', title:'Distribuição do investimento', fmt:brl},
+    {key:'reach',       label:'Alcance',      title:'Distribuição do alcance',      fmt:int},
+    {key:'impressions', label:'Impressões',   title:'Distribuição das impressões',  fmt:int}
+  ];
+
+  var charts = {};
+  var state = {metric:'roas', share:'revenue', sortKey:'revenue', sortDir:-1};
+
+  function css(name){return getComputedStyle(document.documentElement).getPropertyValue(name).trim();}
+  function colorOf(c){return css(c.color);}
+
+  function baseOptions(valueFmt){
+    return {
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{labels:{color:css('--ink-2'),boxWidth:10,boxHeight:10,font:{family:'Lexend',size:12}}},
+        tooltip:{
+          backgroundColor:css('--ink'),titleColor:css('--surface'),bodyColor:css('--surface'),padding:10,
+          callbacks:{
+            title:function(items){var c=items[0].chart.$campaigns; return c?c[items[0].dataIndex].name:items[0].label;},
+            label:function(ctx){return ctx.dataset.label+': '+valueFmt(ctx.parsed.y);}
+          }
+        }
+      },
+      scales:{
+        x:{grid:{display:false},border:{color:css('--axis')},ticks:{color:css('--ink-2'),font:{family:'Lexend',size:12}}},
+        y:{beginAtZero:true,grid:{color:css('--grid')},border:{display:false},ticks:{color:css('--muted'),font:{family:'Lexend',size:11},callback:function(v){return v.toLocaleString('pt-BR');}}}
+      }
+    };
+  }
+
+  function buildMoney(){
+    var list = campaigns.filter(function(c){return c.revenue!==null;});
+    var cfg = {
+      type:'bar',
+      data:{labels:list.map(function(c){return c.short;}),datasets:[
+        {label:'Investimento',data:list.map(function(c){return c.spend;}),backgroundColor:css('--m-spend'),borderRadius:4,maxBarThickness:34},
+        {label:'Receita',data:list.map(function(c){return c.revenue;}),backgroundColor:css('--m-rev'),borderRadius:4,maxBarThickness:34}
+      ]},
+      options:baseOptions(brl)
+    };
+    charts.money = new Chart(document.getElementById('chartMoney'),cfg);
+    charts.money.$campaigns = list;
+  }
+
+  function buildMetric(){
+    var m = metrics.filter(function(x){return x.key===state.metric;})[0];
+    var list = campaigns.filter(function(c){return c[m.key]!==null;});
+    document.getElementById('metricTitle').textContent = m.label+' por campanha';
+    var opts = baseOptions(m.fmt);
+    opts.plugins.legend = {display:false};
+    if(charts.metric){charts.metric.destroy();}
+    charts.metric = new Chart(document.getElementById('chartMetric'),{
+      type:'bar',
+      data:{labels:list.map(function(c){return c.short;}),datasets:[
+        {label:m.label,data:list.map(function(c){return c[m.key];}),backgroundColor:list.map(colorOf),borderRadius:4,maxBarThickness:48}
+      ]},
+      options:opts
+    });
+    charts.metric.$campaigns = list;
+  }
+
+  function buildShare(){
+    var s = shares.filter(function(x){return x.key===state.share;})[0];
+    var list = campaigns.filter(function(c){return c[s.key]!==null;});
+    var total = list.reduce(function(a,c){return a+c[s.key];},0);
+    document.getElementById('shareTitle').textContent = s.title;
+    if(charts.share){charts.share.destroy();}
+    charts.share = new Chart(document.getElementById('chartShare'),{
+      type:'doughnut',
+      data:{labels:list.map(function(c){return c.name;}),datasets:[
+        {data:list.map(function(c){return c[s.key];}),backgroundColor:list.map(colorOf),borderColor:css('--surface'),borderWidth:2,hoverOffset:6}
+      ]},
+      options:{
+        responsive:true,maintainAspectRatio:false,cutout:'62%',
+        plugins:{
+          legend:{display:false},
+          tooltip:{backgroundColor:css('--ink'),titleColor:css('--surface'),bodyColor:css('--surface'),padding:10,
+            callbacks:{label:function(ctx){return s.fmt(ctx.parsed)+' · '+pct(ctx.parsed/total*100);}}}
+        }
+      }
+    });
+    var legend = document.getElementById('shareLegend');
+    legend.innerHTML = '';
+    list.forEach(function(c){
+      var span = document.createElement('span');
+      var dot = document.createElement('i');
+      dot.style.background = colorOf(c);
+      span.appendChild(dot);
+      span.appendChild(document.createTextNode(c.short+' · '+pct(c[s.key]/total*100)));
+      legend.appendChild(span);
+    });
+  }
+
+  function buildMille(){
+    var list = campaigns.filter(function(c){return c.revenue!==null;});
+    var cfg = {
+      type:'bar',
+      data:{labels:list.map(function(c){return c.short;}),datasets:[
+        {label:'Custo por mil impressões',data:list.map(function(c){return c.cpm;}),backgroundColor:css('--m-spend'),borderRadius:4,maxBarThickness:34},
+        {label:'Receita por mil impressões',data:list.map(function(c){return Math.round(c.revenue/c.impressions*100000)/100;}),backgroundColor:css('--m-rev'),borderRadius:4,maxBarThickness:34}
+      ]},
+      options:baseOptions(brl)
+    };
+    charts.mille = new Chart(document.getElementById('chartMille'),cfg);
+    charts.mille.$campaigns = list;
+  }
+
+  function buildSeg(containerId, items, stateKey, rebuild){
+    var box = document.getElementById(containerId);
+    items.forEach(function(item){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = item.label;
+      b.setAttribute('aria-pressed', String(state[stateKey]===item.key));
+      b.addEventListener('click',function(){
+        state[stateKey] = item.key;
+        Array.prototype.forEach.call(box.children,function(el){el.setAttribute('aria-pressed','false');});
+        b.setAttribute('aria-pressed','true');
+        rebuild();
+      });
+      box.appendChild(b);
+    });
+  }
+
+  var columns = [
+    {key:'name',        label:'Campanha',         fmt:function(v){return v;}},
+    {key:'spend',       label:'Investimento',     fmt:brl},
+    {key:'purchases',   label:'Compras',          fmt:int},
+    {key:'revenue',     label:'Receita',          fmt:brl},
+    {key:'roas',        label:'ROAS',             fmt:dec},
+    {key:'cpa',         label:'Custo por compra', fmt:brl},
+    {key:'reach',       label:'Alcance',          fmt:int},
+    {key:'impressions', label:'Impressões',       fmt:int},
+    {key:'freq',        label:'Frequência',       fmt:dec},
+    {key:'cpm',         label:'CPM',              fmt:brl}
+  ];
+
+  function buildTable(){
+    var head = document.getElementById('tableHead');
+    var body = document.getElementById('tableBody');
+    head.innerHTML = ''; body.innerHTML = '';
+    columns.forEach(function(col){
+      var th = document.createElement('th');
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = col.label + (state.sortKey===col.key ? (state.sortDir<0?' ↓':' ↑') : '');
+      b.addEventListener('click',function(){
+        if(state.sortKey===col.key){state.sortDir = -state.sortDir;}
+        else{state.sortKey = col.key; state.sortDir = col.key==='name'?1:-1;}
+        buildTable();
+      });
+      th.appendChild(b); head.appendChild(th);
+    });
+    var rows = campaigns.slice().sort(function(a,b){
+      var x=a[state.sortKey], y=b[state.sortKey];
+      if(x===null && y===null){return 0;}
+      if(x===null){return 1;}
+      if(y===null){return -1;}
+      if(typeof x==='string'){return x.localeCompare(y,'pt-BR')*state.sortDir;}
+      return (x-y)*state.sortDir;
+    });
+    rows.forEach(function(c){
+      var tr = document.createElement('tr');
+      columns.forEach(function(col,i){
+        var td = document.createElement('td');
+        td.className = i ? 'num' : '';
+        if(!i){var dot=document.createElement('i'); dot.style.background=colorOf(c); td.appendChild(dot);}
+        var v = c[col.key];
+        td.appendChild(document.createTextNode(v===null ? 'n/d' : col.fmt(v)));
+        tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    });
+  }
+
+  function renderAll(){
+    if(typeof Chart==='undefined'){return;}
+    ['money','mille'].forEach(function(k){if(charts[k]){charts[k].destroy();}});
+    buildMoney(); buildMetric(); buildShare(); buildMille();
+  }
+
+  buildSeg('metricSeg', metrics, 'metric', buildMetric);
+  buildSeg('shareSeg', shares, 'share', buildShare);
+  buildTable();
+  renderAll();
+
+  if(window.matchMedia){
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    var onChange = function(){renderAll(); buildTable();};
+    if(mq.addEventListener){mq.addEventListener('change',onChange);}
+  }
+})();
+</script>
+</body>
+</html>
